@@ -17,9 +17,16 @@ const buscarUsuarioPorEmail = async (email) => {
 };
 
 const listarTodosUsuarios = async () => {
-  const query = "SELECT * from usuario"
+  try {
+    const query = "SELECT * from usuario"
     const { rows } = await conexao.query(query);
-  return rows;
+  
+    return rows;
+} catch (erro) {
+    console.error("Erro na consulta ao banco de dados:", erro);
+    // Envie uma resposta de erro ao navegador
+    res.status(500).json({ mensagem: "Erro interno do servidor" }); 
+}
 }
 
 const buscarUsuarioPorId = async (id) => {
@@ -59,6 +66,13 @@ const excluirUsuario = async (id) => {
   return rows[0];
 }
 
+const colocarImagem = async (id, imagemFinal) => {
+  const query = `UPDATE usuario SET imagem_url = $1 WHERE id_usuario = $2 RETURNING *`;
+  const { rows } = await conexao.query(query, [imagemFinal, id]);
+  return await rows[0];
+}
+
+
 const gerarSenhaHash = async (senha) => {
   console.log(bcrypt.hash(senha, 10));
   return bcrypt.hash(senha, 10);
@@ -77,4 +91,5 @@ module.exports = {
   excluirUsuario,
   gerarSenhaHash,
   compararSenhas,
+  colocarImagem
 };

@@ -17,12 +17,13 @@ const criar = async (req, res) => {
 // Listar todas
 const listar = async (req, res) => {
   try {
-    const lista = await candidaturaModel.listarCandidaturas();
-    res.json(lista);
+    const candidaturas = await candidaturaModel.listarCandidaturas();
+    res.json(candidaturas);
   } catch (error) {
+    console.error("Erro detalhado:", error);
     res
       .status(500)
-      .json({ erro: "Erro ao listar candidaturas", detalhe: error.message });
+      .json({ erro: "Erro ao buscar candidaturas", detalhe: error.message });
   }
 };
 
@@ -49,7 +50,10 @@ const atualizar = async (req, res) => {
   const { status_candidatura } = req.body;
 
   try {
-    const candidatura = await candidaturaModel.atualizarStatus(id, status_candidatura);
+    const candidatura = await candidaturaModel.atualizarStatus(
+      id,
+      status_candidatura
+    );
     if (!candidatura) {
       return res.status(404).json({ erro: "Candidatura não encontrada" });
     }

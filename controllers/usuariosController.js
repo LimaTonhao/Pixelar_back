@@ -62,8 +62,9 @@ const loginUsuario = async (req, res) => {
 
 const listarTodosUsuarios = async (req, res) => {
   try {
+  console.log("lsitaTodos");
   const usuario = await usuarioModel.listarTodosUsuarios()
-
+  console.log("lsitaTodos 2");
   res.status(201).json(usuario);
   } catch (error) {
     res.status(500).json({
@@ -149,11 +150,29 @@ const excluirUsuario = async (req, res) => {
   }
 }
 
+const colocarImagem = async (req, res) => {
+  const { id } = req.params
+  const { imagem } = req.body
+  
+  try {
+    const imagemFinal = await uploadBase64ToStorage(imagem)
+
+    const imagemColocada = await usuarioModel.colocarImagem(id ,imagemFinal);
+    res.status(201).json(imagemColocada)
+  } catch (error) {
+    res.status(500).json({
+      erro: `Erro ao colocar imagem`,
+      detalhe: error.message
+    })
+  }
+}
+
 module.exports = {
   cadastrarUsuario,
   loginUsuario,
   listarTodosUsuarios,
   buscarUsuarioPorId,
   atualizarUsuario,
-  excluirUsuario
+  excluirUsuario,
+  colocarImagem
 };

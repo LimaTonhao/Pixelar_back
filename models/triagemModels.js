@@ -9,7 +9,40 @@ const criarTriagem = async ({ id_candidatura, pontuacao, resultado }) => {
   `;
   const values = [id_candidatura, pontuacao, resultado];
   const { rows } = await pool.query(query, values);
+
+  // Atualiza o status da candidatura
+  await pool.query(
+    `UPDATE candidatura
+     SET status_candidatura = $1
+     WHERE id_candidatura = $2`,
+    [resultado, id_candidatura]
+  );
+
   return rows[0];
+};
+
+// Atualizar triagem
+const atualizarTriagem = async (id_triagem, { pontuacao, resultado }) => {
+  const query = `
+    UPDATE triagem
+    SET pontuacao = $1, resultado = $2
+    WHERE id_triagem = $3
+    RETURNING *;
+  `;
+  const values = [pontuacao, resultado, id_triagem];
+  const { rows } = await pool.query(query, values);
+
+  const triagem = rows[0];
+
+  // Atualiza o status da candidatura
+  await pool.query(
+    `UPDATE candidatura
+     SET status_candidatura = $1
+     WHERE id_candidatura = $2`,
+    [resultado, triagem.id_candidatura]
+  );
+
+  return triagem;
 };
 
 // Listar todas as triagens
@@ -31,19 +64,6 @@ const listarPorCandidatura = async (id_candidatura) => {
   const query = "SELECT * FROM triagem WHERE id_candidatura = $1";
   const { rows } = await pool.query(query, [id_candidatura]);
   return rows;
-};
-
-// Atualizar triagem
-const atualizarTriagem = async (id_triagem, { pontuacao, resultado }) => {
-  const query = `
-    UPDATE triagem
-    SET pontuacao = $1, resultado = $2
-    WHERE id_triagem = $3
-    RETURNING *;
-  `;
-  const values = [pontuacao, resultado, id_triagem];
-  const { rows } = await pool.query(query, values);
-  return rows[0];
 };
 
 // Deletar triagem

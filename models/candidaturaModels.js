@@ -11,16 +11,25 @@ const criarCandidatura = async (id_vaga, id_curriculo) => {
 };
 
 // Listar todas candidaturas
+
 const listarCandidaturas = async () => {
-  const result = await pool.query(
-    `SELECT c.id_candidatura, c.data_candidatura, c.status_candidatura,
-            v.titulo AS vaga, u.nome AS candidato
-     FROM candidatura c
-     JOIN vaga v ON c.id_vaga = v.id_vaga
-     JOIN curriculo cur ON c.id_curriculo = cur.id_curriculo
-     JOIN usuario u ON cur.id_usuario = u.id_usuario
-     ORDER BY c.data_candidatura DESC`
-  );
+  const result = await pool.query(`
+    SELECT 
+      c.id_candidatura,
+      c.id_vaga,
+      c.data_candidatura AS data,
+      c.status_candidatura AS status,
+      u.id_usuario,
+      u.nome,
+      v.titulo AS vagaTitulo,
+      t.pontuacao
+    FROM candidatura c
+    JOIN curriculo cr ON c.id_curriculo = cr.id_curriculo
+    JOIN usuario u ON cr.id_usuario = u.id_usuario
+    JOIN vaga v ON c.id_vaga = v.id_vaga
+    LEFT JOIN triagem t ON c.id_candidatura = t.id_candidatura
+  `);
+
   return result.rows;
 };
 

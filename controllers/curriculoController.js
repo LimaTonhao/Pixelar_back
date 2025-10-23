@@ -64,7 +64,21 @@ const buscarCurriculoPorId = async (req, res) => {
     });
   }
 };
-
+const buscarPorUsuario = async (req, res) => {
+  const id_usuario = req.params.id; // pegar o ID do usuário
+  try {
+    const resultado = await curriculoModel.buscarPorUsuario(id_usuario);
+    if (!resultado) {
+      return res.status(404).json({ erro: "Currículo não encontrado" });
+    }
+    res.status(200).json(resultado);
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro ao buscar currículo por usuário",
+      detalhe: error.message,
+    });
+  }
+};
 // Atualizar currículo
 const atualizarCurriculo = async (req, res) => {
   const { id } = req.params;
@@ -117,4 +131,5 @@ module.exports = {
   buscarCurriculoPorId,
   atualizarCurriculo,
   deletarCurriculo,
+  buscarPorUsuario,
 };

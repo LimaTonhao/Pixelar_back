@@ -52,6 +52,13 @@ const buscarPorId = async (id_curriculo) => {
   );
   return result.rows[0];
 };
+const buscarPorUsuario = async (id_usuario) => {
+  const result = await pool.query(
+    `SELECT * FROM curriculo WHERE id_usuario = $1`,
+    [id_usuario]
+  );
+  return result.rows[0];
+};
 
 // Atualizar currículo
 const atualizarCurriculo = async (
@@ -103,4 +110,5 @@ module.exports = {
   buscarPorId,
   atualizarCurriculo,
   deletarCurriculo,
+  buscarPorUsuario,
 };
