@@ -49,8 +49,6 @@ const uploadBase64ToStorage = async (dataUrl) => {
 };
 
 const cadastrarUsuario = async (req, res) => {
-  console.log(req.body);
-
   const { nome, email, cpf_cnpj, senha, cargo, foto } = req.body;
   console.log("cadastro usuario");
   let ImageUrl;
@@ -158,7 +156,7 @@ const buscarUsuarioPorId = async (req, res) => {
 const atualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, email, cpf_cnpj, cargo, senha } = req.body;
+    const { nome, email, cpf_cnpj, cargo, senha, foto } = req.body;
 
     const usuarioExiste = await usuarioModel.buscarUsuarioPorId(id);
     if (!usuarioExiste) {
@@ -169,8 +167,20 @@ const atualizarUsuario = async (req, res) => {
     if (senha) {
       senhaHash = await usuarioModel.gerarSenhaHash(senha);
     }
+    let ImageUrl = usuarioExiste.foto;
 
-    const dadosAtualizados = { nome, email, cpf_cnpj, cargo, senha: senhaHash };
+    if (foto && foto.startsWith("data:")) {
+      ImageUrl = await uploadBase64ToStorage(foto);
+    }
+
+    const dadosAtualizados = {
+      nome,
+      email,
+      cpf_cnpj,
+      cargo,
+      senha: senhaHash,
+      foto: ImageUrl,
+    };
 
     const usuarioAtualizado = await usuarioModel.atualizarUsuario(
       id,
@@ -219,6 +229,7 @@ const atualizarDescricaoPerfil = async (req, res) => {
     }
 
     const usuario = await usuarioModel.buscarUsuarioPorId(id);
+
     if (!usuario) {
       return res.status(404).json({ mensagem: "Usuário não encontrado." });
     }
@@ -233,12 +244,14 @@ const atualizarDescricaoPerfil = async (req, res) => {
       usuario: usuarioAtualizado,
     });
   } catch (error) {
+
     res.status(500).json({
       erro: "Erro ao atualizar descrição do perfil",
       detalhe: error.message,
     });
   }
 };
+
 const buscarDescricaoPorId = async (req, res) => {
   const { id } = req.params;
   try {

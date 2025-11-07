@@ -1,26 +1,58 @@
 const curriculoModel = require("../models/curriculoModels");
+const { put, del } = require("@vercel/blob");
 
+const uploadBase64ToStorage = async (dataUrl) => {
+  console.log(dataUrl);
+
+  if (!dataUrl || !dataUrl.startsWith("data:")) {
+    console.log("entrou no erro");
+    throw new Error("Formato de Base64 inválido.");
+  }
+
+  const parts = dataUrl.split(";base64,");
+
+  if (parts.length !== 2) {
+    throw new Error("Base64 malformado.");
+  }
+  const mimeType = parts[0].split(":")[1];
+  const base64Data = parts[1];
+
+  const fileBuffer = Buffer.from(base64Data, "base64");
+
+  // Nomes de variáveis
+  const extensaoMapeada = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "application/pdf": "pdf",
+    "image/svg+xml": "svg",
+  };
+  const extensao = extensaoMapeada[mimeType] || "bin";
+
+  // Gera nome de arquivo único (chave única no Vercel Blob)
+  const NomeArquivo = `${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(2, 9)}.${extensao}`;
+
+  // Salva no Vercel Blob
+  const resultado = await put(NomeArquivo, fileBuffer, {
+    access: "public", // Permite acesso público via URL
+    contentType: mimeType, // Define o tipo de conteúdo
+  });
+
+  // Retorna a URL pública gerada pelo Vercel Blob
+  return resultado.url;
+};
 // Criar Currículo
 const criarCurriculo = async (req, res) => {
-  const {
-    id_usuario,
-    data_nascimento,
-    experiencia,
-    formacao,
-    habilidades,
-    cursos_complementares,
-    redes_sociais,
-  } = req.body;
+  const { id_usuario, arquivo_curriculo } = req.body;
+  let pdfUrl;
+  pdfUrl = await uploadBase64ToStorage(arquivo_curriculo);
+  console.log(pdfUrl);
 
   try {
     const novoCurriculo = await curriculoModel.criarCurriculo({
       id_usuario,
-      data_nascimento,
-      experiencia,
-      formacao,
-      habilidades,
-      cursos_complementares,
-      redes_sociais,
+      pdfUrl,
     });
 
     res.status(201).json(novoCurriculo);
@@ -82,23 +114,11 @@ const buscarPorUsuario = async (req, res) => {
 // Atualizar currículo
 const atualizarCurriculo = async (req, res) => {
   const { id } = req.params;
-  const {
-    data_nascimento,
-    experiencia,
-    formacao,
-    habilidades,
-    cursos_complementares,
-    redes_sociais,
-  } = req.body;
+  const { pdfUrl } = req.body;
 
   try {
     const curriculoAtualizado = await curriculoModel.atualizarCurriculo(id, {
-      data_nascimento,
-      experiencia,
-      formacao,
-      habilidades,
-      cursos_complementares,
-      redes_sociais,
+      pdfUrl,
     });
 
     res.json(curriculoAtualizado);

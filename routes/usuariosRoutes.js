@@ -13,5 +13,13 @@ router.get("/listarTodos", usuariosController.listarTodosUsuarios); //autenticar
 router.get("/buscarPorId/:id", usuariosController.buscarUsuarioPorId); //autenticarToken,
 router.put("/atualizar/:id", usuariosController.atualizarUsuario); //autenticarToken,
 router.delete("/excluir/:id", usuariosController.excluirUsuario); //autenticarToken,
+router.put(
+  "/atualizarDescricao/:id",
+  usuariosController.atualizarDescricaoPerfil
+); //autenticarToken,
+router.get(
+  "/buscarDescricao/:id",
+  usuariosController.buscarDescricaoPorId
+); //autenticarToken,
 
 module.exports = router;

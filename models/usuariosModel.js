@@ -13,6 +13,7 @@ const atualizarDescricaoPerfil = async (id, descricao_perfil) => {
   const { rows } = await conexao.query(query, values);
   return rows[0];
 };
+
 const criarUsuario = async (nome, email, cpf_cnpj, senha, cargo, ImageUrl) => {
   const query = `
     INSERT INTO usuario (nome, email, cpf_cnpj, senha, cargo, foto)
@@ -25,7 +26,7 @@ const criarUsuario = async (nome, email, cpf_cnpj, senha, cargo, ImageUrl) => {
     cpf_cnpj,
     senha,
     cargo,
-    ImageUrl
+    ImageUrl,
   ]);
   return rows[0];
 };
@@ -58,16 +59,16 @@ const buscarDescricaoPorId = async (id) => {
 };
 
 const atualizarUsuario = async (id, dados) => {
-  const { nome, email, cpf_cnpj, cargo, senha } = dados;
+  const { nome, email, cpf_cnpj, cargo, senha, foto } = dados;
 
   const query = `
     UPDATE usuario
-    SET nome = $1, email = $2, cpf_cnpj = $3, cargo = $4, senha = $5
-    WHERE id_usuario = $6
+    SET nome = $1, email = $2, cpf_cnpj = $3, cargo = $4, senha = $5, foto = $6
+    WHERE id_usuario = $7
     RETURNING *
   `;
 
-  const values = [nome, email, cpf_cnpj, cargo, senha, id];
+  const values = [nome, email, cpf_cnpj, cargo, senha, foto, id];
 
   const { rows } = await conexao.query(query, values);
   return rows[0];

@@ -1,38 +1,17 @@
 const pool = require("../conexao");
 
 // Criar currículo
-const criarCurriculo = async ({
-  id_usuario,
-  data_nascimento,
-  experiencia,
-  formacao,
-  habilidades,
-  cursos_complementares,
-  redes_sociais,
-}) => {
+const criarCurriculo = async ({ id_usuario, pdfUrl }) => {
   const query = `
     INSERT INTO curriculo (
       id_usuario,
-      data_nascimento,
-      experiencia,
-      formacao,
-      habilidades,
-      cursos_complementares,
-      redes_sociais
+      arquivo_curriculo
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    VALUES ($1, $2)
     RETURNING *;
   `;
 
-  const values = [
-    id_usuario,
-    data_nascimento,
-    experiencia,
-    formacao,
-    habilidades,
-    cursos_complementares,
-    redes_sociais,
-  ];
+  const values = [id_usuario, pdfUrl];
 
   const result = await pool.query(query, values);
   return result.rows[0];
@@ -61,39 +40,16 @@ const buscarPorUsuario = async (id_usuario) => {
 };
 
 // Atualizar currículo
-const atualizarCurriculo = async (
-  id_curriculo,
-  {
-    data_nascimento,
-    experiencia,
-    formacao,
-    habilidades,
-    cursos_complementares,
-    redes_sociais,
-  }
-) => {
+const atualizarCurriculo = async (id_curriculo, { pdfUrl }) => {
   const query = `
     UPDATE curriculo
     SET
-      data_nascimento = $2,
-      experiencia = $3,
-      formacao = $4,
-      habilidades = $5,
-      cursos_complementares = $6,
-      redes_sociais = $7
+      arquivo_curriculo = $2
     WHERE id_curriculo = $1
     RETURNING *;
   `;
 
-  const values = [
-    id_curriculo,
-    data_nascimento,
-    experiencia,
-    formacao,
-    habilidades,
-    cursos_complementares,
-    redes_sociais,
-  ];
+  const values = [id_curriculo, pdfUrl];
 
   const result = await pool.query(query, values);
   return result.rows[0];
