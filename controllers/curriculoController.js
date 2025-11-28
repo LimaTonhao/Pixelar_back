@@ -111,24 +111,28 @@ const buscarPorUsuario = async (req, res) => {
     });
   }
 };
-// Atualizar currículo
 const atualizarCurriculo = async (req, res) => {
-  const { id } = req.params;
-  const { pdfUrl } = req.body;
+  const id_curriculo = req.params.id; // <-- agora com o nome correto
+  const { arquivo_curriculo } = req.body;
 
   try {
-    const curriculoAtualizado = await curriculoModel.atualizarCurriculo(id, {
-      pdfUrl,
+    const pdfUrl = await uploadBase64ToStorage(arquivo_curriculo);
+
+    const curriculoAtualizado = await curriculoModel.atualizarCurriculo({
+      id_curriculo,
+      pdfUrl
     });
 
-    res.json(curriculoAtualizado);
+    return res.json(curriculoAtualizado);
+
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       erro: "Erro ao atualizar currículo",
       detalhe: error.message,
     });
   }
 };
+
 
 // Deletar currículo
 const deletarCurriculo = async (req, res) => {

@@ -33,27 +33,28 @@ const buscarPorId = async (id_curriculo) => {
 };
 const buscarPorUsuario = async (id_usuario) => {
   const result = await pool.query(
-    `SELECT * FROM curriculo WHERE id_usuario = $1`,
+    `SELECT * FROM curriculo WHERE id_usuario = $1 ORDER BY id_curriculo DESC LIMIT 1`,
     [id_usuario]
   );
   return result.rows[0];
 };
 
-// Atualizar currículo
-const atualizarCurriculo = async (id_curriculo, { pdfUrl }) => {
+const atualizarCurriculo = async ({ id_curriculo, pdfUrl }) => {
   const query = `
     UPDATE curriculo
-    SET
-      arquivo_curriculo = $2
+    SET arquivo_curriculo = $2
     WHERE id_curriculo = $1
     RETURNING *;
   `;
 
   const values = [id_curriculo, pdfUrl];
 
+  console.log("Valores para atualização:", values);
+
   const result = await pool.query(query, values);
   return result.rows[0];
 };
+
 
 // Deletar currículo
 const deletarCurriculo = async (id) => {
