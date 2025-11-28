@@ -43,16 +43,39 @@ const buscarPorId = async (req, res) => {
       .json({ erro: "Erro ao buscar candidatura", detalhe: error.message });
   }
 };
+const buscarPorUsuario = async (req, res) => {
+  console.log("ID RECEBIDO NA ROTA:", req.params.id_usuario);
+
+  const { id_usuario } = req.params;
+
+  try {
+    const candidatura = await candidaturaModel.buscarCandidaturaPorUsuario(
+      id_usuario
+    );
+
+    if (!candidatura || candidatura.length === 0) {
+      return res.status(404).json({ erro: "Nenhuma candidatura encontrada" });
+    }
+
+    res.json(candidatura);
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro ao buscar candidatura",
+      detalhe: error.message,
+    });
+  }
+};
 
 // Atualizar status
 const atualizar = async (req, res) => {
   const { id } = req.params;
-  const { status_candidatura } = req.body;
+  const { status_candidatura, pontuacao } = req.body;
 
   try {
-    const candidatura = await candidaturaModel.atualizarStatus(
+    const candidatura = await candidaturaModel.atualizar(
       id,
-      status_candidatura
+      status_candidatura,
+      pontuacao
     );
     if (!candidatura) {
       return res.status(404).json({ erro: "Candidatura não encontrada" });
@@ -85,4 +108,5 @@ module.exports = {
   buscarPorId,
   atualizar,
   deletar,
+  buscarPorUsuario,
 };

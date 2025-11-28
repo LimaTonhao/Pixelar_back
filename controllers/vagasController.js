@@ -6,7 +6,7 @@ const criarVaga = async (req, res) => {
     req.body;
 
   try {
-    const userCheck = await conexao.query(
+    const userCheck = await conexao.query(  
       "SELECT tipo_usuario FROM usuario WHERE id_usuario = $1",
       [id_usuario]
     );

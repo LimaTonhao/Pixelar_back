@@ -10,6 +10,11 @@ const {
 router.post("/criar", candidaturaController.criar); //autenticarToken,
 router.get("/listar", candidaturaController.listar); //autenticarToken, somenteAvaliador,
 router.get("/listar/:id", candidaturaController.buscarPorId); //autenticarToken,
+router.get(
+  "/listarPorUsuario/:id_usuario",
+  candidaturaController.buscarPorUsuario
+);
+
 router.put("/atualizar/:id", candidaturaController.atualizar); //autenticarToken, somenteAvaliador,
 router.delete("/deletar/:id", candidaturaController.deletar); //autenticarToken,
 
