@@ -2,10 +2,14 @@ const candidaturaModel = require("../models/candidaturaModels");
 
 // Criar
 const criar = async (req, res) => {
-  const { id_vaga, id_curriculo } = req.body;
-
+  const { id_vaga, id_curriculo, id_usuario } = req.body;
   try {
-    const nova = await candidaturaModel.criarCandidatura(id_vaga, id_curriculo);
+    const nova = await candidaturaModel.criarCandidatura(
+      id_vaga,
+      id_curriculo,
+      id_usuario
+    );
+
     res.status(201).json(nova);
   } catch (error) {
     res
@@ -44,16 +48,12 @@ const buscarPorId = async (req, res) => {
   }
 };
 const buscarPorUsuario = async (req, res) => {
-  console.log("ID RECEBIDO NA ROTA:", req.params.id_usuario);
-
   const { id_usuario } = req.params;
 
   try {
-    const candidatura = await candidaturaModel.buscarCandidaturaPorUsuario(
-      id_usuario
-    );
+    const candidatura = await candidaturaModel.buscarCandidaturaPorUsuario(id_usuario);
 
-    if (!candidatura || candidatura.length === 0) {
+    if (!candidatura) {
       return res.status(404).json({ erro: "Nenhuma candidatura encontrada" });
     }
 
