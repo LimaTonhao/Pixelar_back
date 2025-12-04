@@ -33,11 +33,25 @@ const listarCandidaturas = async () => {
 
 const buscarCandidaturaPorUsuario = async (id_usuario) => {
   const result = await pool.query(
-    `SELECT * FROM candidatura WHERE id_usuario = $1`,
+    `
+      SELECT 
+        usuario.nome AS empresa,
+        vaga.titulo,
+        candidatura.data_candidatura,
+        candidatura.status_candidatura,
+        candidatura.pontuacao,
+        candidatura.id_candidatura
+      FROM candidatura
+      JOIN vaga ON vaga.id_vaga = candidatura.id_vaga
+      JOIN usuario ON usuario.id_usuario = vaga.id_usuario
+      WHERE candidatura.id_usuario = $1
+    `,
     [id_usuario]
   );
-  return result.rows[0];
+
+  return result.rows;
 };
+
 
 const buscarCandidaturaPorVaga = async (id_vaga) => {
   const result = await pool.query(
